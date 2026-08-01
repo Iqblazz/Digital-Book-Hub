@@ -32,7 +32,12 @@ class BorrowingController extends Controller
         'return_date.after_or_equal' => 'The return date must be a date after or equal to the borrow date.',
     ]);
 
-    // Lanjutkan proses simpan data...
+    $book = Book::find($request->book_id);
+    if (!$book || $book->stock <= 0) {
+        return redirect()->back()->with('error', 'Book stock is empty.');
+    }
+
+    $book->decrement('stock');
     Borrowing::create($request->all());
 
     return redirect()->route('borrowings.index')->with('success', 'Transaction added successfully!');
